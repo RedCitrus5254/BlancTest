@@ -8,28 +8,28 @@ namespace WebApi.BusinessLogic.RequestHandlers
 {
     public class GetTodoItemRequestHandler
     {
-        private readonly ITodoItemRepository _todoItemRepository;
+        private readonly ITodoItemRepository todoItemRepository;
 
-        public GetTodoItemRequestHandler(ITodoItemRepository todoItemRepository)
+        public GetTodoItemRequestHandler(
+            ITodoItemRepository todoItemRepository)
         {
-            _todoItemRepository = todoItemRepository;
+            this.todoItemRepository = todoItemRepository;
         }
 
-        public async Task<GetTodoItemResponse> HandleAsync(Guid id)
+        public async Task<GetTodoItemResponse> HandleAsync(
+            Guid id)
         {
-            var item = await _todoItemRepository.GetAsync(id);
+            var entity = await this.todoItemRepository.GetAsync(id: id);
 
-            if (item == null)
+            if (entity == null)
             {
-                throw new BadRequestException("NotFound");
+                throw new NotFoundException(errorCode: "NotFound");
             }
 
-            return new GetTodoItemResponse
-            {
-                Id = item.Id,
-                Title = item.Title,
-                IsCompleted = item.IsCompleted
-            };
+            return new GetTodoItemResponse(
+                id: entity.Id,
+                title: entity.Title,
+                isCompleted: entity.IsCompleted);
         }
     }
 }

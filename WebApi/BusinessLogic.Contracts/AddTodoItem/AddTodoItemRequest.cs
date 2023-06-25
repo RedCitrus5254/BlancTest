@@ -2,6 +2,12 @@ namespace WebApi.BusinessLogic.Contracts.AddTodoItem
 {
     public class AddTodoItemRequest
     {
-        public string Title { get; set; } = null!;
+        public AddTodoItemRequest(
+            string Title)
+        {
+            this.Title = Title;
+        }
+
+        public string Title { get; }
     }
 }

@@ -4,8 +4,18 @@ namespace WebApi.BusinessLogic.Contracts.GetTodoItem
 {
     public class GetTodoItemResponse
     {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = null!;
-        public bool IsCompleted { get; set; }
+        public GetTodoItemResponse(
+            Guid id,
+            string title,
+            bool isCompleted)
+        {
+            this.Id = id;
+            this.Title = title;
+            this.IsCompleted = isCompleted;
+        }
+
+        public Guid Id { get; }
+        public string Title { get; }
+        public bool IsCompleted { get; }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.BusinessLogic.Contracts.AddTodoItem;
@@ -14,14 +15,17 @@ namespace WebApi.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly GetTodoItemRequestHandler _getTodoItemRequestHandler;
+        private readonly GetTodoItemsRequestHandler _getTodoItemsRequestHandler;
         private readonly AddTodoItemRequestHandler _addTodoItemRequestHandler;
 
         public TodoItemsController(
             GetTodoItemRequestHandler getTodoItemRequestHandler,
+            GetTodoItemsRequestHandler getTodoItemsRequestHandler,
             AddTodoItemRequestHandler addTodoItemRequestHandler
         )
         {
             _getTodoItemRequestHandler = getTodoItemRequestHandler;
+            _getTodoItemsRequestHandler = getTodoItemsRequestHandler;
             _addTodoItemRequestHandler = addTodoItemRequestHandler;
         }
 
@@ -29,6 +33,12 @@ namespace WebApi.Controllers
         public Task<GetTodoItemResponse> GetTodoItemAsync(Guid id)
         {
             return _getTodoItemRequestHandler.HandleAsync(id);
+        }
+
+        [HttpGet]
+        public Task<GetTodoItemListResponse> GetTodoItemsAsync()
+        {
+            return _getTodoItemsRequestHandler.HandleAsync();
         }
 
         [HttpPost]
@@ -40,8 +50,7 @@ namespace WebApi.Controllers
         [HttpPut("{id:guid}")]
         public Task<GetTodoItemResponse> UpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            return this.UpdateTodoItemAsync(id, request);
         }
     }
 }

@@ -3,15 +3,12 @@ using System.Collections.Generic;
 
 namespace WebApi.BusinessLogic.Contracts.GetTodoItemList
 {
-    public class GetTodoItemListResponse
-    {
-        public List<GetTodoItemListElement> Items { get; set; } = new();
-    }
+    public record GetTodoItemListResponse(
+        List<GetTodoItemListElement> Items
+    );
 
-    public class GetTodoItemListElement
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = null!;
-        public bool IsCompleted { get; set; }
-    }
+    public record GetTodoItemListElement(
+        Guid Id,
+        string Title,
+        bool IsCompleted);
 }

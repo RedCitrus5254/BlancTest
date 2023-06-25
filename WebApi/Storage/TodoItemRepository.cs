@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using Npgsql;
 using WebApi.Storage.Contracts.Entities;
 using WebApi.Storage.Contracts.Repositories;
@@ -11,34 +12,56 @@ namespace WebApi.Storage
 {
     public class TodoItemRepository : ITodoItemRepository
     {
-        private readonly string _connectionString;
+        private readonly string postgresConnectionString;
 
-        public TodoItemRepository(IConfiguration configuration)
+        public TodoItemRepository(
+            string postgresConnectionString)
         {
-            _connectionString = configuration.GetConnectionString("postgres");
+            this.postgresConnectionString = postgresConnectionString;
         }
 
-        public async Task<TodoItemEntity?> GetAsync(Guid id)
+        public async Task<TodoItemEntity?> GetAsync(
+            Guid id)
         {
             using var dbConnection = GetDbConnection();
 
-            var item = await dbConnection.QueryFirstOrDefaultAsync<TodoItemEntity>(@"
-                select * from todoItems
-                where id = :id;
-            ", new { id });
+            var item = await dbConnection.QueryFirstOrDefaultAsync<TodoItemEntity>(
+                sql: @"
+                    select * from todoItems
+                    where id = :id;",
+                param: new { id });
 
             return item;
         }
 
-        public Task AddOrUpdateAsync(TodoItemEntity entity)
+        public Task AddOrUpdateAsync(
+            TodoItemEntity entity)
         {
-            // TODO: implement
-            throw new NotImplementedException();
+            using var dbConnection = GetDbConnection();
+
+            return dbConnection.ExecuteAsync(
+                sql: @"
+                    insert into todoItems (id, title, isCompleted)
+                    values (:id, :title, :isCompleted)
+                    on conflict (id) do update
+                    set title = :title,
+                    isCompleted = :isCompleted;",
+                param: new { id = entity.Id, title = entity.Title, isCompleted = entity.IsCompleted });
         }
 
         private IDbConnection GetDbConnection()
         {
-            return new NpgsqlConnection(_connectionString);
+            return new NpgsqlConnection(postgresConnectionString);
+        }
+
+        public async Task<List<TodoItemEntity>> GetAllAsync()
+        {
+            using var dbConnection = GetDbConnection();
+
+            var entities = await dbConnection.QueryAsync<TodoItemEntity>(
+                sql: @"select * from todoItems;");
+
+            return entities.ToList();
         }
     }
 }
