@@ -1,6 +1,5 @@
 namespace WebApi.Tests;
 
-using System;
 using System.Text;
 using Newtonsoft.Json;
 using WebApi.BusinessLogic.Contracts.AddTodoItem;
@@ -55,16 +54,16 @@ internal class V1Client
     internal Task<HttpResponseMessage> UpdateTodoItemAsync(
         string id,
         string title,
-        string isCompleted)
+        bool isCompleted)
     {
-        var updateTodoItemRequest = new
+        var updateTodoItemRequest = new UpdateTodoItemRequest()
         {
             Title = title,
             IsCompleted = isCompleted
         };
         var request = new HttpRequestMessage(
             method: HttpMethod.Put,
-            requestUri: "todoitems/{id}");
+            requestUri: $"todoitems/{id}");
 
         request.Content = new StringContent(
             content: JsonConvert.SerializeObject(updateTodoItemRequest),

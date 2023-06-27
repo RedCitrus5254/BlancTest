@@ -1,10 +1,11 @@
-using System;
-using System.Threading.Tasks;
-using WebApi.BusinessLogic.Contracts.UpdateTodoItem;
-using WebApi.Storage.Contracts.Repositories;
-
 namespace WebApi.BusinessLogic.RequestHandlers
 {
+    using System;
+    using System.Threading.Tasks;
+    using WebApi.BusinessLogic.Contracts.Exceptions;
+    using WebApi.BusinessLogic.Contracts.UpdateTodoItem;
+    using WebApi.Storage.Contracts.Repositories;
+
     public class UpdateTodoItemRequestHandler
     {
         private readonly ITodoItemRepository todoItemRepository;
@@ -15,11 +16,18 @@ namespace WebApi.BusinessLogic.RequestHandlers
             this.todoItemRepository = todoItemRepository;
         }
 
-        public Task HandleAsync(
+        public async Task HandleAsync(
             Guid id,
             UpdateTodoItemRequest request)
         {
-            return this.todoItemRepository.AddOrUpdateAsync(
+            var entity = await this.todoItemRepository.GetAsync(id: id);
+
+            if (entity == null)
+            {
+                throw new NotFoundException(errorCode: "NotFound");
+            }
+
+            await this.todoItemRepository.AddOrUpdateAsync(
                 new Storage.Contracts.Entities.TodoItemEntity
                 {
                     Id = id,

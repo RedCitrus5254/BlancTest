@@ -34,12 +34,12 @@ namespace WebApi.Storage
             return item;
         }
 
-        public Task AddOrUpdateAsync(
+        public async Task AddOrUpdateAsync(
             TodoItemEntity entity)
         {
             using var dbConnection = GetDbConnection();
 
-            return dbConnection.ExecuteAsync(
+            await dbConnection.ExecuteAsync(
                 sql: @"
                     insert into todoItems (id, title, isCompleted)
                     values (:id, :title, :isCompleted)
@@ -47,11 +47,6 @@ namespace WebApi.Storage
                     set title = :title,
                     isCompleted = :isCompleted;",
                 param: new { id = entity.Id, title = entity.Title, isCompleted = entity.IsCompleted });
-        }
-
-        private IDbConnection GetDbConnection()
-        {
-            return new NpgsqlConnection(postgresConnectionString);
         }
 
         public async Task<List<TodoItemEntity>> GetAllAsync()
@@ -62,6 +57,11 @@ namespace WebApi.Storage
                 sql: @"select * from todoItems;");
 
             return entities.ToList();
+        }
+
+        private IDbConnection GetDbConnection()
+        {
+            return new NpgsqlConnection(postgresConnectionString);
         }
     }
 }

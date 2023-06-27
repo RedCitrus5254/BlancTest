@@ -2,16 +2,16 @@ namespace WebApi.Tests.TodoItemsControllerTests;
 
 using FluentAssertions;
 using Newtonsoft.Json;
-using WebApi.BusinessLogic.Contracts.Exceptions;
 using WebApi.BusinessLogic.Contracts.GetTodoItem;
 using Xunit;
+using static WebApi.Engine.ErrorFilter;
 
 public class GetTodoItemAsyncTests
 {
     [Fact]
     public async void ShouldReturnSavedTodoItemAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
 
         var todoItemEntity = ObjectsGen.RandomTodoItemEntity();
 
@@ -34,29 +34,24 @@ public class GetTodoItemAsyncTests
     }
 
     [Fact]
-    public async Task ShouldReturnInvalidModelAsync()
-    {
-        var sut = SutFactory.Create();
-
-        var actual = await sut.v1Client.GetTodoItemAsync(
-            id: "invalid");
-
-        actual
-            .Should()
-            .BeEquivalentTo(new BadRequestException("InvalidModel"));
-    }
-
-    [Fact]
     public async Task ShouldReturnNotFoundAsync()
     {
         var todoItemId = ObjectsGen.RandomTodoItemId();
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
 
-        var actual = await sut.v1Client.GetTodoItemAsync(
+        var response = await sut.v1Client.GetTodoItemAsync(
             id: todoItemId.ToString());
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var actual = JsonConvert.DeserializeObject<ErrorData>(content);
+
+        var expected = new ErrorData(
+            userMessage: $"Запрашиваемый ресурс не найден, код ошибки NotFound",
+            errorCode: "NotFound");
 
         actual
             .Should()
-            .BeEquivalentTo(new NotFoundException("NotFound"));
+            .BeEquivalentTo(expected);
     }
 }

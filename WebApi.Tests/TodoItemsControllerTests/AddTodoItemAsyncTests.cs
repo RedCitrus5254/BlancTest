@@ -3,15 +3,16 @@ namespace WebApi.Tests.TodoItemsControllerTests;
 using FluentAssertions;
 using Newtonsoft.Json;
 using WebApi.BusinessLogic.Contracts.AddTodoItem;
-using WebApi.BusinessLogic.Contracts.Exceptions;
 using Xunit;
+using static WebApi.Engine.ErrorFilter;
 
 public class AddTodoItemAsyncTests
 {
     [Fact]
     public async Task ShouldAddTodoItemAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
+
         var title = ObjectsGen.RandomTitle();
 
         var response = await sut.v1Client.SaveTodoItemAsync(
@@ -32,13 +33,21 @@ public class AddTodoItemAsyncTests
     [Fact]
     public async Task ShouldReturnInvalidModelAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
 
-        var actual = await sut.v1Client.SaveTodoItemAsync(
-            title: null);
+        var response = await sut.v1Client.SaveTodoItemAsync(
+            title: string.Empty);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var actual = JsonConvert.DeserializeObject<ErrorData>(content);
+
+        var expected = new ErrorData(
+            userMessage: $"Некорректная модель, код ошибки InvalidModel",
+            errorCode: "InvalidModel");
 
         actual
             .Should()
-            .BeEquivalentTo(new InvalidModelException("InvalidModel"));
+            .BeEquivalentTo(expected);
     }
 }

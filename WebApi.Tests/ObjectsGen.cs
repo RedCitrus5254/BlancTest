@@ -10,7 +10,7 @@ internal static class ObjectsGen
 
     internal static string RandomTitle()
     {
-        throw new NotImplementedException();
+        return faker.Random.Words();
     }
 
     internal static TodoItemEntity RandomTodoItemEntity()
@@ -18,7 +18,7 @@ internal static class ObjectsGen
         return new TodoItemEntity()
         {
             Id = RandomTodoItemId(),
-            Title = faker.Random.String(),
+            Title = faker.Random.Words(),
             IsCompleted = faker.Random.Bool()
         };
     }

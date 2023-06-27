@@ -1,33 +1,35 @@
 namespace WebApi.Tests.TodoItemsControllerTests;
 
 using FluentAssertions;
-using WebApi.BusinessLogic.Contracts.Exceptions;
+using Newtonsoft.Json;
 using WebApi.Storage.Contracts.Entities;
 using Xunit;
+using static WebApi.Engine.ErrorFilter;
 
 public class UpdateTodoItemAsyncTests
 {
     [Fact]
     public async Task ShouldUpdateTodoItemAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
         var todoItemEntity = ObjectsGen.RandomTodoItemEntity();
+        var newTitle = ObjectsGen.RandomTitle();
 
         await sut.SaveTodoItemAsync(todoItemEntity);
 
-        await sut.v1Client.UpdateTodoItemAsync(
+        var response = await sut.v1Client.UpdateTodoItemAsync(
             id: todoItemEntity.Id.ToString(),
-            title: todoItemEntity.Title,
-            isCompleted: todoItemEntity.IsCompleted.ToString());
+            title: newTitle,
+            isCompleted: todoItemEntity.IsCompleted);
 
         var expected = new TodoItemEntity()
         {
             Id = todoItemEntity.Id,
-            Title = todoItemEntity.Title,
+            Title = newTitle,
             IsCompleted = todoItemEntity.IsCompleted
         };
 
-        var actual = sut.GetTodoItemAsync(
+        var actual = await sut.GetTodoItemAsync(
             id: todoItemEntity.Id);
 
         actual
@@ -38,31 +40,47 @@ public class UpdateTodoItemAsyncTests
     [Fact]
     public async Task ShouldReturnInvalidModelAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
 
-        var actual = await sut.v1Client.UpdateTodoItemAsync(
+        var response = await sut.v1Client.UpdateTodoItemAsync(
             id: ObjectsGen.RandomTodoItemId().ToString(),
-            title: ObjectsGen.RandomTitle(),
-            isCompleted: "invalid");
+            title: string.Empty,
+            isCompleted: false);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var actual = JsonConvert.DeserializeObject<ErrorData>(content);
+
+        var expected = new ErrorData(
+            userMessage: $"Некорректная модель, код ошибки InvalidModel",
+            errorCode: "InvalidModel");
 
         actual
             .Should()
-            .BeEquivalentTo(new InvalidModelException("InvalidModel"));
+            .BeEquivalentTo(expected);
     }
 
     [Fact]
     public async Task ShouldReturnNotFoundAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
         var todoItemEntity = ObjectsGen.RandomTodoItemEntity();
 
-        var actual = await sut.v1Client.UpdateTodoItemAsync(
+        var response = await sut.v1Client.UpdateTodoItemAsync(
             id: todoItemEntity.Id.ToString(),
             title: todoItemEntity.Title,
-            isCompleted: todoItemEntity.IsCompleted.ToString());
+            isCompleted: todoItemEntity.IsCompleted);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var actual = JsonConvert.DeserializeObject<ErrorData>(content);
+
+        var expected = new ErrorData(
+            userMessage: $"Запрашиваемый ресурс не найден, код ошибки NotFound",
+            errorCode: "NotFound");
 
         actual
             .Should()
-            .BeEquivalentTo(new NotFoundException("NotFound"));
+            .BeEquivalentTo(expected);
     }
 }

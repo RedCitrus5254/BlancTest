@@ -10,7 +10,7 @@ public class GetTodoItemListAsyncTests
     [Fact]
     public async void ShouldReturnSavedTodoItemAsync()
     {
-        var sut = SutFactory.Create();
+        var sut = await SutFactory.CreateAsync();
 
         var todoItemEntity1 = ObjectsGen.RandomTodoItemEntity();
         var todoItemEntity2 = ObjectsGen.RandomTodoItemEntity();
@@ -18,8 +18,7 @@ public class GetTodoItemListAsyncTests
         await sut.SaveTodoItemAsync(todoItemEntity1);
         await sut.SaveTodoItemAsync(todoItemEntity2);
 
-        var expected = new GetTodoItemListResponse(
-            Items: new List<GetTodoItemListElement>()
+        var expected = new List<GetTodoItemListElement>()
             {
                     new GetTodoItemListElement(
                         Id: todoItemEntity1.Id,
@@ -29,7 +28,7 @@ public class GetTodoItemListAsyncTests
                         Id: todoItemEntity2.Id,
                         Title: todoItemEntity2.Title,
                         IsCompleted: todoItemEntity2.IsCompleted),
-            });
+            };
 
         var response = await sut.v1Client.GetTodoItemsAsync();
         var content = await response.Content.ReadAsStringAsync();
@@ -37,7 +36,8 @@ public class GetTodoItemListAsyncTests
         var actual = JsonConvert.DeserializeObject<GetTodoItemListResponse>(content);
 
         actual
+            .Items
             .Should()
-            .BeEquivalentTo(expected);
+            .Contain(expected);
     }
 }

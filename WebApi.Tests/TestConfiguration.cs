@@ -1,8 +1,12 @@
+using Bogus;
+
 namespace WebApi.Tests;
 
 public static class TestsConfiguration
 {
-    public static string PostgresConnectionString { get; } = "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres";
+    private static Faker faker = new Faker();
 
-    public static string WebApiUrl { get; } = "https://localhost";
+    public static string PostgresConnectionString { get; } = $"host=localhost;port=5432;database=homework;username=tester;password=tester;";
+
+    public static string WebApiUrl { get; } = "http://localhost:5000";
 }
