@@ -30,7 +30,18 @@ namespace WebApi.Engine
                     statusCode = StatusCodes.Status400BadRequest;
                     userMessage = $"Некорректный запрос, код ошибки {badRequestException.ErrorCode}";
                     errorCode = badRequestException.ErrorCode;
+                    break;
 
+                case NotFoundException notFoundException:
+                    statusCode = StatusCodes.Status404NotFound;
+                    userMessage = $"Запрашиваемый ресурс не найден, код ошибки {notFoundException.ErrorCode}";
+                    errorCode = notFoundException.ErrorCode;
+                    break;
+
+                case InvalidModelException invalidModelException:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    userMessage = $"Некорректная модель, код ошибки {invalidModelException.ErrorCode}";
+                    errorCode = invalidModelException.ErrorCode;
                     break;
             }
 

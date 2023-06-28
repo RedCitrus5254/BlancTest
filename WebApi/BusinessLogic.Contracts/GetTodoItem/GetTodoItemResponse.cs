@@ -2,10 +2,8 @@ using System;
 
 namespace WebApi.BusinessLogic.Contracts.GetTodoItem
 {
-    public class GetTodoItemResponse
-    {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = null!;
-        public bool IsCompleted { get; set; }
-    }
+    public record GetTodoItemResponse(
+            Guid Id,
+            string Title,
+            bool IsCompleted);
 }
