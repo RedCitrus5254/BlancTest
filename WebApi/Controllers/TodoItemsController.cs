@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.BusinessLogic.Contracts.AddTodoItem;
@@ -19,18 +17,18 @@ namespace WebApi.Controllers
     public class TodoItemsController : ControllerBase
     {
         private readonly GetTodoItemRequestHandler getTodoItemRequestHandler;
-        private readonly GetTodoItemsRequestHandler getTodoItemsRequestHandler;
+        private readonly GetTodoItemListRequestHandler getTodoItemListRequestHandler;
         private readonly AddTodoItemRequestHandler addTodoItemRequestHandler;
         private readonly UpdateTodoItemRequestHandler updateTodoItemRequestHandler;
 
         public TodoItemsController(
             GetTodoItemRequestHandler getTodoItemRequestHandler,
-            GetTodoItemsRequestHandler getTodoItemsRequestHandler,
+            GetTodoItemListRequestHandler getTodoItemsRequestHandler,
             AddTodoItemRequestHandler addTodoItemRequestHandler,
             UpdateTodoItemRequestHandler updateTodoItemRequestHandler)
         {
             this.getTodoItemRequestHandler = getTodoItemRequestHandler;
-            this.getTodoItemsRequestHandler = getTodoItemsRequestHandler;
+            this.getTodoItemListRequestHandler = getTodoItemsRequestHandler;
             this.addTodoItemRequestHandler = addTodoItemRequestHandler;
             this.updateTodoItemRequestHandler = updateTodoItemRequestHandler;
         }
@@ -44,7 +42,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public Task<GetTodoItemListResponse> GetTodoItemListAsync()
         {
-            return getTodoItemsRequestHandler.HandleAsync();
+            return getTodoItemListRequestHandler.HandleAsync();
         }
 
         [HttpPost]
@@ -60,7 +58,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut("{id:guid}")]
-        public async Task TaskUpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
+        public async Task UpdateTodoItemAsync(Guid id, [FromBody] UpdateTodoItemRequest request)
         {
             if (request.Title == string.Empty)
             {

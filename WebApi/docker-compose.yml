@@ -1,0 +1,30 @@
+version: "3.0"
+
+services:
+  webapi:
+    container_name: "webapi_container"
+    image: "webapi_image"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    depends_on:
+      - "postgres"
+    networks:
+      - aspnetcoreapp-network
+
+  postgres:
+    container_name: "postgres"
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: tester
+      POSTGRES_PASSWORD: tester
+    networks:
+      - aspnetcoreapp-network
+
+networks:
+  aspnetcoreapp-network:
+    driver: bridge

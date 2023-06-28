@@ -6,11 +6,11 @@ using WebApi.Storage.Contracts.Repositories;
 
 namespace WebApi.BusinessLogic.RequestHandlers
 {
-    public class GetTodoItemsRequestHandler
+    public class GetTodoItemListRequestHandler
     {
         private readonly ITodoItemRepository todoItemRepository;
 
-        public GetTodoItemsRequestHandler(
+        public GetTodoItemListRequestHandler(
             ITodoItemRepository todoItemRepository)
         {
             this.todoItemRepository = todoItemRepository;

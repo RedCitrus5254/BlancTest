@@ -56,11 +56,10 @@ internal class V1Client
         string title,
         bool isCompleted)
     {
-        var updateTodoItemRequest = new UpdateTodoItemRequest()
-        {
-            Title = title,
-            IsCompleted = isCompleted
-        };
+        var updateTodoItemRequest = new UpdateTodoItemRequest(
+            Title: title,
+            IsCompleted: isCompleted);
+
         var request = new HttpRequestMessage(
             method: HttpMethod.Put,
             requestUri: $"todoitems/{id}");

@@ -19,19 +19,15 @@ namespace WebApi.BusinessLogic.RequestHandlers
         public async Task<AddTodoItemResponse> HandleAsync(
             AddTodoItemRequest request)
         {
-            var entity = new TodoItemEntity
-            {
-                Id = Guid.NewGuid(),
-                Title = request.Title,
-                IsCompleted = false,
-            };
+            var entity = new TodoItemEntity(
+                Id: Guid.NewGuid(),
+                Title: request.Title,
+                IsCompleted: false);
 
             await this.todoItemRepository.AddOrUpdateAsync(entity);
 
-            return new AddTodoItemResponse()
-            {
-                Id = entity.Id,
-            };
+            return new AddTodoItemResponse(
+                Id: entity.Id);
         }
     }
 }

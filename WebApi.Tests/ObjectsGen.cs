@@ -15,12 +15,10 @@ internal static class ObjectsGen
 
     internal static TodoItemEntity RandomTodoItemEntity()
     {
-        return new TodoItemEntity()
-        {
-            Id = RandomTodoItemId(),
-            Title = faker.Random.Words(),
-            IsCompleted = faker.Random.Bool()
-        };
+        return new TodoItemEntity(
+            Id: RandomTodoItemId(),
+            Title: faker.Random.Words(),
+            IsCompleted: faker.Random.Bool());
     }
 
     internal static Guid RandomTodoItemId()

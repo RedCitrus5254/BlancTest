@@ -11,7 +11,7 @@ public class AddTodoItemAsyncTests
     [Fact]
     public async Task ShouldAddTodoItemAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
 
         var title = ObjectsGen.RandomTitle();
 
@@ -33,7 +33,7 @@ public class AddTodoItemAsyncTests
     [Fact]
     public async Task ShouldReturnInvalidModelAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
 
         var response = await sut.v1Client.SaveTodoItemAsync(
             title: string.Empty);

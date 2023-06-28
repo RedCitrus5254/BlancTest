@@ -1,5 +1,6 @@
-using System;
 using System.IO;
+using System.Reflection;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using WebApi.BusinessLogic.RequestHandlers;
+using WebApi.Queue;
 using WebApi.Storage;
+using WebApi.Storage.Contracts.Repositories;
 
 namespace WebApi
 {
@@ -16,6 +19,24 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMassTransit(x =>
+            {
+                x.SetKebabCaseEndpointNameFormatter();
+                x.SetInMemorySagaRepositoryProvider();
+
+                var assembly = Assembly.GetEntryAssembly();
+
+                x.AddConsumer<UpdateTodoITemMessageConsumer>();
+                x.AddSagaStateMachines(assembly);
+                x.AddSagas(assembly);
+                x.AddActivities(assembly);
+
+                x.UsingInMemory((context, cfg) =>
+                {
+                    cfg.ConfigureEndpoints(context);
+                });
+            });
+
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", false)
@@ -50,16 +71,13 @@ namespace WebApi
             // Хранилища
             var todoItemRepository = new TodoItemRepository(
                 postgresConnectionString!);
+            services.AddSingleton<ITodoItemRepository>(todoItemRepository);
 
             // Обработчики запросов
-            services.AddSingleton<AddTodoItemRequestHandler>(new AddTodoItemRequestHandler(
-                todoItemRepository: todoItemRepository));
-            services.AddSingleton<UpdateTodoItemRequestHandler>(new UpdateTodoItemRequestHandler(
-                todoItemRepository: todoItemRepository));
-            services.AddSingleton<GetTodoItemRequestHandler>(new GetTodoItemRequestHandler(
-                todoItemRepository: todoItemRepository));
-            services.AddSingleton<GetTodoItemsRequestHandler>(new GetTodoItemsRequestHandler(
-                todoItemRepository: todoItemRepository));
+            services.AddSingleton<AddTodoItemRequestHandler>();
+            services.AddSingleton<UpdateTodoItemRequestHandler>();
+            services.AddSingleton<GetTodoItemRequestHandler>();
+            services.AddSingleton<GetTodoItemListRequestHandler>();
         }
     }
 }

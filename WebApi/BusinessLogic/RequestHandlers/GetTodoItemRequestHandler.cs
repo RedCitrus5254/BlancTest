@@ -27,9 +27,9 @@ namespace WebApi.BusinessLogic.RequestHandlers
             }
 
             return new GetTodoItemResponse(
-                id: entity.Id,
-                title: entity.Title,
-                isCompleted: entity.IsCompleted);
+                Id: entity.Id,
+                Title: entity.Title,
+                IsCompleted: entity.IsCompleted);
         }
     }
 }

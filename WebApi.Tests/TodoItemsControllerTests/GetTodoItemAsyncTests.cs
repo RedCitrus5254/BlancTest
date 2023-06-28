@@ -11,16 +11,16 @@ public class GetTodoItemAsyncTests
     [Fact]
     public async void ShouldReturnSavedTodoItemAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
 
         var todoItemEntity = ObjectsGen.RandomTodoItemEntity();
 
         await sut.SaveTodoItemAsync(todoItemEntity);
 
         var expected = new GetTodoItemResponse(
-            id: todoItemEntity.Id,
-            title: todoItemEntity.Title,
-            isCompleted: todoItemEntity.IsCompleted);
+            Id: todoItemEntity.Id,
+            Title: todoItemEntity.Title,
+            IsCompleted: todoItemEntity.IsCompleted);
 
         var response = await sut.v1Client.GetTodoItemAsync(
             id: todoItemEntity.Id.ToString());
@@ -37,7 +37,7 @@ public class GetTodoItemAsyncTests
     public async Task ShouldReturnNotFoundAsync()
     {
         var todoItemId = ObjectsGen.RandomTodoItemId();
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
 
         var response = await sut.v1Client.GetTodoItemAsync(
             id: todoItemId.ToString());

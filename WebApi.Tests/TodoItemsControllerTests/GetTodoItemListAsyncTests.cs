@@ -10,7 +10,7 @@ public class GetTodoItemListAsyncTests
     [Fact]
     public async void ShouldReturnSavedTodoItemAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
 
         var todoItemEntity1 = ObjectsGen.RandomTodoItemEntity();
         var todoItemEntity2 = ObjectsGen.RandomTodoItemEntity();

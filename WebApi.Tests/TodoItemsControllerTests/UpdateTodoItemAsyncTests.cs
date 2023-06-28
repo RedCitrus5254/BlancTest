@@ -11,23 +11,23 @@ public class UpdateTodoItemAsyncTests
     [Fact]
     public async Task ShouldUpdateTodoItemAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
         var todoItemEntity = ObjectsGen.RandomTodoItemEntity();
         var newTitle = ObjectsGen.RandomTitle();
 
         await sut.SaveTodoItemAsync(todoItemEntity);
 
-        var response = await sut.v1Client.UpdateTodoItemAsync(
+        await sut.v1Client.UpdateTodoItemAsync(
             id: todoItemEntity.Id.ToString(),
             title: newTitle,
             isCompleted: todoItemEntity.IsCompleted);
 
-        var expected = new TodoItemEntity()
-        {
-            Id = todoItemEntity.Id,
-            Title = newTitle,
-            IsCompleted = todoItemEntity.IsCompleted
-        };
+        await sut.WaitForConsumeEvent();
+
+        var expected = new TodoItemEntity(
+            Id: todoItemEntity.Id,
+            Title: newTitle,
+            IsCompleted: todoItemEntity.IsCompleted);
 
         var actual = await sut.GetTodoItemAsync(
             id: todoItemEntity.Id);
@@ -40,7 +40,7 @@ public class UpdateTodoItemAsyncTests
     [Fact]
     public async Task ShouldReturnInvalidModelAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
 
         var response = await sut.v1Client.UpdateTodoItemAsync(
             id: ObjectsGen.RandomTodoItemId().ToString(),
@@ -63,7 +63,7 @@ public class UpdateTodoItemAsyncTests
     [Fact]
     public async Task ShouldReturnNotFoundAsync()
     {
-        var sut = await SutFactory.CreateAsync();
+        var sut = SutFactory.Create();
         var todoItemEntity = ObjectsGen.RandomTodoItemEntity();
 
         var response = await sut.v1Client.UpdateTodoItemAsync(
